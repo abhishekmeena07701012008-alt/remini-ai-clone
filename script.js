@@ -1,36 +1,37 @@
 const upload = document.getElementById('upload');
+const beforeImg = document.getElementById('beforeImg');
 const canvas = document.getElementById('canvas');
+const downloadBtn = document.getElementById('downloadBtn');
 const ctx = canvas.getContext('2d');
-let model;
 
-// 1. पेज लोड होते ही AI मॉडल लोड करो
-async function loadModel() {
-    console.log("Loading AI Model...");
-    // यहाँ हम एक छोटा 'Enhancement Model' लोड कर रहे हैं
-    model = await tf.loadGraphModel('https://tfhub.dev/tfjs-models/tfjs/mobilenet_v2/1/model.json'); 
-    console.log("Model Loaded Successfully!");
-}
-loadModel();
-
-// 2. फोटो प्रोसेस करने का जादू
-upload.addEventListener('change', async (e) => {
+upload.addEventListener('change', (e) => {
     const file = e.target.files[0];
-    const img = new Image();
-    img.src = URL.createObjectURL(file);
+    const url = URL.createObjectURL(file);
+    beforeImg.src = url;
+    beforeImg.style.display = 'block';
     
-    img.onload = async () => {
+    const img = new Image();
+    img.src = url;
+    img.onload = () => {
         canvas.width = img.width;
         canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
-        
-        // फोटो को AI के लायक बनाओ
-        const tensor = tf.browser.fromPixels(canvas).resizeNearestNeighbor([224, 224]).toFloat().expandDims();
-        
-        // AI मॉडल से प्रेडिक्शन करवाओ
-        const prediction = model.predict(tensor);
-        
-        // आउटपुट को कैनवास पर दिखाओ (यहाँ तू अपनी AI लॉजिक और जोड़ सकता है)
-        console.log("Process Complete:", prediction);
-        alert("Photo processed!");
+        processWithAI(); // यहाँ AI मॉडल कॉल होगा
     };
+});
+
+async function processWithAI() {
+    // यहाँ AI प्रोसेसिंग होगी (यहाँ तेरा मॉडल आएगा)
+    console.log("AI प्रोसेसिंग शुरू हो रही है...");
+    
+    // मान ले AI ने काम कर दिया, अब डाउनलोड बटन दिखाओ
+    downloadBtn.style.display = 'inline-block';
+}
+
+// डाउनलोड का लॉजिक
+downloadBtn.addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'enhanced-photo.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
 });
