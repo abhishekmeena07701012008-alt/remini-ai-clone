@@ -1,31 +1,31 @@
-from flask import Flask, render_template, request, send_file
+import streamlit as st
 import cv2
 import numpy as np
-import os
+from PIL import Image
 
-app = Flask(__name__)
+st.title("📸 Photo Enhancer Pro")
+st.write("अपनी फोटो अपलोड करें और उसे HD में बदलें!")
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        file = request.files['file']
-        if file:
-            # इमेज को प्रोसेस करने का लॉजिक (ओपन सीवी)
-            img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
-            
-            # यहाँ हमारा 'Remini' जैसा कड़क एनहांसमेंट लॉजिक
-            lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-            l, a, b = cv2.split(lab)
-            clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
-            cl = clahe.apply(l)
-            img_final = cv2.merge((cl,a,b))
-            img_final = cv2.cvtColor(img_final, cv2.COLOR_LAB2BGR)
-            
-            # सेव करके वापस भेजना
-            cv2.imwrite('enhanced.jpg', img_final)
-            return send_file('enhanced.jpg', mimetype='image/jpeg')
-            
-    return render_template('index.html')
+uploaded_file = st.file_uploader("फोटो चुनें...", type=["jpg", "jpeg", "png"])
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if uploaded_file is not None:
+    # फोटो प्रोसेस करना
+    file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
+    img = cv2.imdecode(file_bytes, 1)
+    
+    # Remini जैसा शार्पनेस और ब्राइटनेस वाला लॉजिक
+    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    l, a, b = cv2.split(lab)
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+    cl = clahe.apply(l)
+    img_final = cv2.merge((cl,a,b))
+    img_final = cv2.cvtColor(img_final, cv2.COLOR_LAB2BGR)
+    
+    # रिज़ल्ट दिखाना
+    st.image(img_final, caption='Enhanced Photo', use_column_width=True)
+    
+    # डाउनलोड बटन
+    result_pil = Image.fromarray(cv2.cvtColor(img_final, cv2.COLOR_BGR2RGB))
+    result_pil.save("enhanced_photo.jpg")
+    with open("enhanced_photo.jpg", "rb") as file:
+        st.download_button("डाउनलोड करें", file, "enhanced_photo.jpg")
