@@ -2,72 +2,19 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Glow Enhancer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>AI Photo Enhancer</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <style>
+        body { text-align: center; font-family: sans-serif; }
+        #canvas { max-width: 90%; margin-top: 20px; }
+    </style>
 </head>
-<body class="bg-gray-950 text-white p-5">
-    <div class="max-w-md mx-auto text-center">
-        <h2 class="text-3xl font-bold mb-6 text-pink-400">✨ Glow Enhancer</h2>
-        
-        <input type="file" id="fileInput" accept="image/*" class="w-full p-3 bg-gray-800 rounded-lg mb-5">
-        
-        <canvas id="canvas" class="w-full rounded-2xl mb-5 shadow-2xl border-2 border-pink-500 hidden"></canvas>
-        
-        <button id="processBtn" class="w-full bg-pink-600 py-4 rounded-xl font-bold hidden mb-3 hover:bg-pink-500">स्किन ग्लो और गोरापन बढ़ाएं</button>
-        
-        <a id="downloadBtn" class="w-full bg-green-600 py-4 rounded-xl font-bold hidden cursor-pointer">फोटो सेव करें</a>
-        
-        <div id="popup" class="hidden fixed bottom-10 bg-green-600 px-6 py-3 rounded-full shadow-xl">
-            ✅ फाइल गैलरी में सेव हो गई!
-        </div>
-    </div>
+<body>
+    <h2>AI Photo Enhancer</h2>
+    <input type="file" id="upload" accept="image/*">
+    <br>
+    <canvas id="canvas"></canvas>
 
-    <script>
-        const fileInput = document.getElementById('fileInput');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const processBtn = document.getElementById('processBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        let img = new Image();
-
-        fileInput.onchange = (e) => {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                img.onload = () => {
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
-                    canvas.classList.remove('hidden');
-                    processBtn.classList.remove('hidden');
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        };
-
-        processBtn.onclick = () => {
-            // 'Skin Whitening' का जादुई कॉम्बिनेशन
-            // brightness(1.2) = गोरापन, contrast(1.1) = क्लैरिटी, saturate(1.1) = चमक
-            ctx.filter = 'brightness(1.2) contrast(1.1) saturate(1.1) sepia(0.05)';
-            ctx.drawImage(img, 0, 0);
-            
-            downloadBtn.classList.remove('hidden');
-            processBtn.innerText = "प्रोसेस पूरी हुई!";
-        };
-
-        downloadBtn.onclick = () => {
-            // गैलरी में सेव करने का लॉजिक
-            const link = document.createElement('a');
-            link.download = 'Glow_Photo.jpg';
-            link.href = canvas.toDataURL('image/jpeg', 1.0);
-            link.click();
-            
-            // सक्सेस पॉपअप
-            const popup = document.getElementById('popup');
-            popup.classList.remove('hidden');
-            setTimeout(() => popup.classList.add('hidden'), 3000);
-        };
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
