@@ -1,11 +1,44 @@
+
 <!DOCTYPE html>
-<html>
-<head><title>Photo Enhancer Pro</title></head>
-<body>
-    <h1>Photo Enhancer</h1>
-    <form method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <button type="submit">Enhance Now!</button>
-    </form>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Enhancer Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-5">
+    <div class="max-w-md mx-auto text-center">
+        <h1 class="text-3xl font-bold mb-5">📸 Photo Enhancer</h1>
+        
+        <input type="file" id="upload" class="mb-5 block w-full text-sm text-gray-400 border border-gray-600 rounded-lg cursor-pointer bg-gray-700">
+        
+        <img id="preview" class="w-full rounded-xl mb-5 shadow-lg border border-gray-700 hidden">
+        
+        <button id="enhanceBtn" class="w-full bg-blue-600 py-3 rounded-xl font-bold text-lg hidden">प्रोसेस करें</button>
+        
+        <a id="downloadBtn" class="w-full bg-green-600 py-3 rounded-xl font-bold text-lg mt-3 block hidden">डाउनलोड HD फोटो</a>
+    </div>
+
+    <script>
+        // फोटो सेलेक्ट करते ही प्रीव्यू दिखाओ
+        document.getElementById('upload').onchange = function(e) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = document.getElementById('preview');
+                img.src = event.target.result;
+                img.classList.remove('hidden');
+                document.getElementById('enhanceBtn').classList.remove('hidden');
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        };
+
+        // एनहांस बटन पर क्लिक (यहाँ Groq API का Logic लगेगा)
+        document.getElementById('enhanceBtn').onclick = async function() {
+            // यहाँ Groq API को कॉल करके एनहांसमेंट पैरामीटर मंगाएंगे
+            alert("Groq AI फोटो स्कैन कर रहा है...");
+            document.getElementById('downloadBtn').classList.remove('hidden');
+        };
+    </script>
 </body>
 </html>
