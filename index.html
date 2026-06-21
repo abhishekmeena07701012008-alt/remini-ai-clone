@@ -2,30 +2,64 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <title>Photo Enhancer (Fast & Local)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Photo Enhancer</title>
     <style>
-        body { text-align: center; font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
+        /* प्रीमियम डार्क थीम डिज़ाइन */
+        body { 
+            text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #121212; color: #ffffff; padding: 20px; margin: 0;
+        }
+        h1 { color: #00d2ff; }
+        .upload-box { margin: 20px auto; padding: 20px; background: #1e1e1e; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        input[type="file"] { color: white; }
+        
         .container { display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
-        img, canvas { max-width: 350px; border: 3px solid #333; border-radius: 8px; }
-        button { padding: 12px 24px; margin: 10px; cursor: pointer; font-size: 16px; background: #28a745; color: white; border: none; border-radius: 5px; }
-        #status { color: #007bff; font-weight: bold; margin-top: 10px; }
+        .img-box { background: #1e1e1e; padding: 10px; border-radius: 12px; }
+        img, canvas { max-width: 100%; height: auto; width: 300px; border-radius: 8px; border: 2px solid #333; }
+        
+        button { 
+            padding: 12px 25px; margin: 10px; cursor: pointer; font-size: 16px; font-weight: bold;
+            border: none; border-radius: 8px; transition: 0.3s; 
+        }
+        #filterBtn { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; }
+        #downloadBtn { background: linear-gradient(45deg, #00d2ff, #3a7bd5); color: white; }
+        button:active { transform: scale(0.95); }
+
+        /* शानदार डाउनलोड पॉप-अप (Toast Notification) */
+        #popup {
+            visibility: hidden; min-width: 250px; background-color: #4caf50; color: #fff;
+            text-align: center; border-radius: 10px; padding: 15px; position: fixed; 
+            z-index: 1; left: 50%; bottom: 30px; transform: translateX(-50%);
+            font-size: 16px; font-weight: bold; box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+            opacity: 0; transition: opacity 0.5s, bottom 0.5s;
+        }
+        #popup.show { visibility: visible; opacity: 1; bottom: 50px; }
     </style>
 </head>
 <body>
-    <h1>Instant Photo Enhancer</h1>
-    <p>बिना क्रैश हुए फोन के अंदर फोटो साफ़ करेगा।</p>
+    <h1>✨ Pro Enhancer ✨</h1>
     
-    <input type="file" id="upload" accept="image/*">
-    <p id="status"></p>
+    <div class="upload-box">
+        <input type="file" id="upload" accept="image/*">
+    </div>
     
     <div class="container">
-        <div><p>Before</p><img id="beforeImg" src="" style="display:none"></div>
-        <div><p>After (Enhanced)</p><canvas id="canvas" style="display:none"></canvas></div>
+        <div class="img-box" id="beforeBox" style="display:none;">
+            <p>Before</p>
+            <img id="beforeImg" src="">
+        </div>
+        <div class="img-box" id="afterBox" style="display:none;">
+            <p>After (Soft Glow)</p>
+            <canvas id="canvas"></canvas>
+        </div>
     </div>
     
     <br>
-    <button id="filterBtn" style="display:none">Enhance Photo</button>
-    <button id="downloadBtn" style="display:none">Download Photo</button>
+    <button id="filterBtn" style="display:none">✨ Apply Makeup & Glow</button>
+    <button id="downloadBtn" style="display:none">⬇️ Download Photo</button>
+
+    <div id="popup">✅ फोटो डाउनलोड हो गई भाई!</div>
 
     <script src="script.js"></script>
 </body>
