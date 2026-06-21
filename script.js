@@ -1,38 +1,55 @@
-filterBtn.addEventListener('click', async () => {
-    filterBtn.innerText = "✨ Makeup Applying...";
-    filterBtn.disabled = true;
+<!DOCTYPE html>
+<html>
+<body>
+    <!-- फोटो अपलोड का बटन -->
+    <input type="file" id="uploadInput" accept="image/*">
+    <br>
+    <!-- फोटो यहाँ दिखेगी -->
+    <img id="sourceImg" style="display:none; max-width: 300px;">
+    <canvas id="mainCanvas" style="display:none; max-width: 300px;"></canvas>
+    <br>
+    <button id="applyBtn" style="display:none;">फिल्टर लगाओ</button>
+    <button id="downloadBtn" style="display:none;">डाउनलोड करो</button>
 
-    canvas.width = beforeImg.naturalWidth;
-    canvas.height = beforeImg.naturalHeight;
-    ctx.drawImage(beforeImg, 0, 0, canvas.width, canvas.height);
+    <script>
+        const input = document.getElementById('uploadInput');
+        const img = document.getElementById('sourceImg');
+        const canvas = document.getElementById('mainCanvas');
+        const applyBtn = document.getElementById('applyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const ctx = canvas.getContext('2d');
 
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
+        // 1. फोटो अपलोड होते ही लोड करना
+        input.onchange = (e) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                img.src = event.target.result;
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    img.style.display = 'block';
+                    applyBtn.style.display = 'inline-block';
+                };
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        };
 
-    // गोरा करने वाला गणित (बिना ब्राइटनेस के)
-    for (let i = 0; i < data.length; i += 4) {
-        let r = data[i], g = data[i + 1], b = data[i + 2];
+        // 2. फिल्टर बटन
+        applyBtn.onclick = () => {
+            // यहाँ तेरा वो कलर वाला गोरापन वाला कोड काम करेगा
+            // ... (बाकी logic)
+            canvas.style.display = 'block';
+            downloadBtn.style.display = 'inline-block';
+        };
 
-        // स्किन टोन पहचानो
-        if (r > 90 && g > 60 && b > 40 && (r - b) > 10) {
-            // हम 'Brightness' नहीं बढ़ा रहे, बस लाल और पीले को कम करके
-            // नीले/सफेद शेड को बढ़ा रहे हैं (यह स्किन को 'Fair' बनाता है)
-            data[i] = r * 0.95 + 10;   // रेड कम किया
-            data[i + 1] = g * 1.05;    // ग्रीन थोड़ा बढ़ाया (नेचुरल लुक के लिए)
-            data[i + 2] = b * 1.15;    // ब्लू बढ़ाया (गोरापन लाने के लिए)
-        }
-    }
-    
-    ctx.putImageData(imageData, 0, 0);
-
-    // स्किन स्मूथिंग (पिंपल्स हटाने के लिए)
-    // ब्लर बहुत कम किया है ताकि सिर्फ दाग-धब्बे छुपें
-    ctx.filter = 'blur(0.8px)';
-    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
-    ctx.filter = 'none';
-
-    afterBox.style.display = 'block';
-    filterBtn.style.display = 'none';
-    downloadBtn.style.display = 'inline-block';
-    statusText.innerText = "✅ मेकअप और गोरापन लागू हो गया है!";
-});
+        // 3. डाउनलोड बटन
+        downloadBtn.onclick = () => {
+            const link = document.createElement('a');
+            link.download = 'edited-photo.jpg';
+            link.href = canvas.toDataURL('image/jpeg');
+            link.click();
+        };
+    </script>
+</body>
+</html>
