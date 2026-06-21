@@ -1,5 +1,5 @@
 filterBtn.addEventListener('click', async () => {
-    filterBtn.innerText = "✨ Processing...";
+    filterBtn.innerText = "✨ Makeup Applying...";
     filterBtn.disabled = true;
 
     canvas.width = beforeImg.naturalWidth;
@@ -9,33 +9,30 @@ filterBtn.addEventListener('click', async () => {
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
 
-    // --- लॉजिक: स्किन और बैकग्राउंड अलग करना ---
+    // गोरा करने वाला गणित (बिना ब्राइटनेस के)
     for (let i = 0; i < data.length; i += 4) {
         let r = data[i], g = data[i + 1], b = data[i + 2];
 
-        // स्किन टोन की पहचान (यह एक रफ स्किन टोन रेंज है)
-        // अगर पिक्सेल स्किन जैसा है, तो उसे गोरा/स्मूथ करो
-        if (r > 95 && g > 40 && b > 20 && r > g && r > b) {
-            // स्किन को गोरा करना (ब्राइटनेस बढ़ाना)
-            data[i] = Math.min(255, r + 25); 
-            data[i + 1] = Math.min(255, g + 25);
-            data[i + 2] = Math.min(255, b + 25);
-        } else {
-            // बैकग्राउंड को थोड़ा वाइब्रेंट करना (बिना चेहरे पर लाइट डाले)
-            data[i] = Math.min(255, r * 1.1); 
-            data[i + 1] = Math.min(255, g * 1.1);
+        // स्किन टोन पहचानो
+        if (r > 90 && g > 60 && b > 40 && (r - b) > 10) {
+            // हम 'Brightness' नहीं बढ़ा रहे, बस लाल और पीले को कम करके
+            // नीले/सफेद शेड को बढ़ा रहे हैं (यह स्किन को 'Fair' बनाता है)
+            data[i] = r * 0.95 + 10;   // रेड कम किया
+            data[i + 1] = g * 1.05;    // ग्रीन थोड़ा बढ़ाया (नेचुरल लुक के लिए)
+            data[i + 2] = b * 1.15;    // ब्लू बढ़ाया (गोरापन लाने के लिए)
         }
     }
     
     ctx.putImageData(imageData, 0, 0);
 
-    // दाग-धब्बे हटाने के लिए बहुत हल्का सा स्मूथिंग फिल्टर
-    ctx.filter = 'blur(0.5px) contrast(1.05)';
+    // स्किन स्मूथिंग (पिंपल्स हटाने के लिए)
+    // ब्लर बहुत कम किया है ताकि सिर्फ दाग-धब्बे छुपें
+    ctx.filter = 'blur(0.8px)';
     ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
     ctx.filter = 'none';
 
     afterBox.style.display = 'block';
     filterBtn.style.display = 'none';
     downloadBtn.style.display = 'inline-block';
-    statusText.innerText = "✅ चेहरा क्लीन और बैकग्राउंड ब्राइट हो गया है!";
+    statusText.innerText = "✅ मेकअप और गोरापन लागू हो गया है!";
 });
