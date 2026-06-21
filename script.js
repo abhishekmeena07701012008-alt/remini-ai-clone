@@ -1,79 +1,41 @@
-const upload = document.getElementById('upload');
-const beforeImg = document.getElementById('beforeImg');
-const canvas = document.getElementById('canvas');
-const filterBtn = document.getElementById('filterBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-const beforeBox = document.getElementById('beforeBox');
-const afterBox = document.getElementById('afterBox');
-const statusText = document.getElementById('status');
-const popup = document.getElementById('popup');
-const ctx = canvas.getContext('2d');
-
-// 1. फोटो अपलोड हैंडलिंग
-upload.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const url = URL.createObjectURL(file);
-    beforeImg.src = url;
-    statusText.innerText = "फोटो लोड हो रही है...";
-    
-    beforeImg.onload = () => {
-        beforeBox.style.display = 'block';
-        filterBtn.style.display = 'inline-block';
-        filterBtn.disabled = false;
-        filterBtn.innerText = "✨ Clean & Make Instant Fair (गोरा करें)";
-        downloadBtn.style.display = 'none';
-        afterBox.style.display = 'none';
-        statusText.innerText = "फोटो लोड हो गई। अब बटन दबाकर जादू देखें!";
-    };
-});
-
-// 2. चेहरा बिल्कुल गोरा और साफ़ करने का लॉजिक (Instant Skin Whitening)
 filterBtn.addEventListener('click', async () => {
-    filterBtn.innerText = "✨ Whitening...";
-    filterBtn.disabled = true; 
-    statusText.innerText = "चेहरा गोरा और साफ़ किया जा रहा है...";
-    
-    // कैनवास का साइज सेट करो
+    filterBtn.innerText = "✨ Processing...";
+    filterBtn.disabled = true;
+
     canvas.width = beforeImg.naturalWidth;
     canvas.height = beforeImg.naturalHeight;
-
-    // --- स्टेप 1: ओरिजिनल फोटो को थोड़ा ब्राइट और साफ़ करके ड्रा करो ---
-    // brightness(1.25) से चेहरा तुरंत गोरा होगा और contrast(1.1) से फोटो फटेगी नहीं
-    ctx.filter = 'brightness(1.25) contrast(1.1) saturate(1.15)';
     ctx.drawImage(beforeImg, 0, 0, canvas.width, canvas.height);
 
-    // --- स्टेप 2: चेहरा स्मूथ करने की जादुई लेयर (Skin Softening Overlay) ---
-    // हम इसके ऊपर एक हल्की धुंधली (Soft) लेयर चढ़ाएंगे जिससे पिंपल्स और दाग छुप जाएं
-    ctx.globalAlpha = 0.35; // लेयर की मिक्सिंग (35%)
-    ctx.globalCompositeOperation = 'screen'; // यह स्क्रीन मोड चेहरे के सांवलेपन को हटाकर गोरा करता है
-    ctx.filter = 'blur(8px) brightness(1.3)'; // दाग-धब्बे छुपाने के लिए ब्लर और एक्स्ट्रा सफेदी
-    ctx.drawImage(beforeImg, 0, 0, canvas.width, canvas.height);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
 
-    // --- स्टेप 3: बालों और आँखों को वापस शार्प करना ---
-    // सब कुछ वापस नॉर्मल करो ताकि फोटो नकली न लगे
-    ctx.globalAlpha = 1.0;
-    ctx.globalCompositeOperation = 'source-over';
+    // --- लॉजिक: स्किन और बैकग्राउंड अलग करना ---
+    for (let i = 0; i < data.length; i += 4) {
+        let r = data[i], g = data[i + 1], b = data[i + 2];
+
+        // स्किन टोन की पहचान (यह एक रफ स्किन टोन रेंज है)
+        // अगर पिक्सेल स्किन जैसा है, तो उसे गोरा/स्मूथ करो
+        if (r > 95 && g > 40 && b > 20 && r > g && r > b) {
+            // स्किन को गोरा करना (ब्राइटनेस बढ़ाना)
+            data[i] = Math.min(255, r + 25); 
+            data[i + 1] = Math.min(255, g + 25);
+            data[i + 2] = Math.min(255, b + 25);
+        } else {
+            // बैकग्राउंड को थोड़ा वाइब्रेंट करना (बिना चेहरे पर लाइट डाले)
+            data[i] = Math.min(255, r * 1.1); 
+            data[i + 1] = Math.min(255, g * 1.1);
+        }
+    }
+    
+    ctx.putImageData(imageData, 0, 0);
+
+    // दाग-धब्बे हटाने के लिए बहुत हल्का सा स्मूथिंग फिल्टर
+    ctx.filter = 'blur(0.5px) contrast(1.05)';
+    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
     ctx.filter = 'none';
 
-    // UI अपडेट करो (यह काम सिर्फ 1 सेकंड में हो जाएगा!)
     afterBox.style.display = 'block';
     filterBtn.style.display = 'none';
     downloadBtn.style.display = 'inline-block';
-    statusText.innerText = "✅ जादू पूरा हुआ भाई! चेहरा एकदम गोरा और साफ़ हो गया है।";
-});
-
-// 3. डाउनलोड और पॉप-अप (Toast)
-downloadBtn.addEventListener('click', () => {
-    const link = document.createElement('a');
-    link.download = 'Instant_Fair_Photo.jpg';
-    link.href = canvas.toDataURL('image/jpeg', 0.95); 
-    link.click();
-
-    // पॉप-अप दिखाओ
-    popup.classList.add("show");
-    setTimeout(() => {
-        popup.classList.remove("show");
-    }, 3000);
+    statusText.innerText = "✅ चेहरा क्लीन और बैकग्राउंड ब्राइट हो गया है!";
 });
