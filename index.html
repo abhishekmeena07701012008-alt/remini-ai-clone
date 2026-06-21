@@ -2,33 +2,30 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <title>AI Photo Enhancer (Local GPU)</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/upscaler@latest/dist/browser/umd/upscaler.min.js"></script>
+    <title>Photo Enhancer (Fast & Local)</title>
     <style>
         body { text-align: center; font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
         .container { display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
         img, canvas { max-width: 350px; border: 3px solid #333; border-radius: 8px; }
-        button { padding: 12px 24px; margin: 10px; cursor: pointer; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 5px; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        #status { color: #d9534f; font-weight: bold; margin-top: 10px; }
+        button { padding: 12px 24px; margin: 10px; cursor: pointer; font-size: 16px; background: #28a745; color: white; border: none; border-radius: 5px; }
+        #status { color: #007bff; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <h1>AI Enhancer (On-Device GPU)</h1>
-    <p>यह आपके फोन के हार्डवेयर का इस्तेमाल करके फोटो साफ करेगा।</p>
+    <h1>Instant Photo Enhancer</h1>
+    <p>बिना क्रैश हुए फोन के अंदर फोटो साफ़ करेगा।</p>
     
     <input type="file" id="upload" accept="image/*">
     <p id="status"></p>
     
     <div class="container">
         <div><p>Before</p><img id="beforeImg" src="" style="display:none"></div>
-        <div><p>After (GPU Enhanced)</p><canvas id="canvas" style="display:none"></canvas></div>
+        <div><p>After (Enhanced)</p><canvas id="canvas" style="display:none"></canvas></div>
     </div>
     
     <br>
-    <button id="filterBtn" style="display:none">Apply AI Filter (Use GPU)</button>
-    <button id="downloadBtn" style="display:none">Download Enhanced Photo</button>
+    <button id="filterBtn" style="display:none">Enhance Photo</button>
+    <button id="downloadBtn" style="display:none">Download Photo</button>
 
     <script src="script.js"></script>
 </body>
